@@ -16,12 +16,28 @@ async function main() {
     // await listDatabases(client);
 
     // create listing
-    await createListing(client, {
-      name: "Lovely Loft",
-      summary: "A charming loft in Paris",
-      bedroom: 1,
-      bathroom: 1,
-    });
+    // await createListing(client, {
+    //   name: "Lovely Loft",
+    //   summary: "A charming loft in Paris",
+    //   bedroom: 1,
+    //   bathroom: 1,
+    // });
+
+    // create multiple listings
+    await createMultipleListings(client, [
+      {
+        name: "Lovely Loft I",
+        summary: "A charming loft in Paris",
+        bedroom: 1,
+        bathroom: 1,
+      },
+      {
+        name: "Lovely Loft II",
+        summary: "A charming loft in Paris",
+        bedroom: 1,
+        bathroom: 1,
+      },
+    ]);
   } catch (err) {
     console.error(err);
   } finally {
@@ -53,4 +69,17 @@ async function createListing(client, newListing) {
     .insertOne(newListing);
 
   console.log(result.insertedId);
+}
+
+/**
+ * Create multiple listings
+ */
+async function createMultipleListings(client, newListings) {
+  const result = await client
+    .db("sample_airbnb")
+    .collection("listingsAndReviews")
+    .insertMany(newListings);
+
+  console.log(result.insertedCount);
+  console.log(result.insertedIds);
 }
