@@ -24,20 +24,23 @@ async function main() {
     // });
 
     // create multiple listings
-    await createMultipleListings(client, [
-      {
-        name: "Lovely Loft I",
-        summary: "A charming loft in Paris",
-        bedroom: 1,
-        bathroom: 1,
-      },
-      {
-        name: "Lovely Loft II",
-        summary: "A charming loft in Paris",
-        bedroom: 1,
-        bathroom: 1,
-      },
-    ]);
+    // await createMultipleListings(client, [
+    //   {
+    //     name: "Lovely Loft I",
+    //     summary: "A charming loft in Paris",
+    //     bedroom: 1,
+    //     bathroom: 1,
+    //   },
+    //   {
+    //     name: "Lovely Loft II",
+    //     summary: "A charming loft in Paris",
+    //     bedroom: 1,
+    //     bathroom: 1,
+    //   },
+    // ]);
+
+    // get listing
+    await findOneListingByName(client, "Lovely Loft I");
   } catch (err) {
     console.error(err);
   } finally {
@@ -82,4 +85,21 @@ async function createMultipleListings(client, newListings) {
 
   console.log(result.insertedCount);
   console.log(result.insertedIds);
+}
+
+/**
+ * Retrieve a listing
+ */
+
+async function findOneListingByName(client, listingName) {
+  const result = await client
+    .db("sample_airbnb")
+    .collection("listingsAndReviews")
+    .findOne({ name: listingName });
+
+  if (result) {
+    console.log(result);
+  } else {
+    console.log(`${listingName} listing found`);
+  }
 }
