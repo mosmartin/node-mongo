@@ -40,7 +40,13 @@ async function main() {
     // ]);
 
     // get listing
-    await findOneListingByName(client, "Lovely Loft I");
+    // await findOneListingByName(client, "Lovely Loft I");
+
+    await findListings(client, {
+      minBedrooms: 4,
+      minBathrooms: 2,
+      maxResults: 5,
+    });
   } catch (err) {
     console.error(err);
   } finally {
@@ -101,5 +107,35 @@ async function findOneListingByName(client, listingName) {
     console.log(result);
   } else {
     console.log(`${listingName} listing found`);
+  }
+}
+
+/**
+ * Retrieve multiple listings
+ */
+async function findListings(
+  client,
+  {
+    minBedrooms = 0,
+    minBathrooms = 0,
+    maxResults = Number.MAX_SAFE_INTEGER,
+  } = {}
+) {
+  const cursor = await client
+    .db("sample_airbnb")
+    .collection("listingsAndReviews")
+    .find({
+      bedrooms: { $gte: minBedrooms },
+      bathrooms: { $gte: minBathrooms },
+    })
+    .sort({ last_review: -1 })
+    .limit(maxResults);
+
+  const results = await cursor.toArray();
+
+  if (results.length > 0) {
+    results.forEach((result, i) => {
+      console.log(`${i + 1}. ${result.name}`);
+    });
   }
 }
