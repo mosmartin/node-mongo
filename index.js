@@ -8,6 +8,8 @@ async function main() {
 
   try {
     await client.connect();
+
+    await listDatabases(client);
   } catch (err) {
     console.error(err);
   } finally {
@@ -15,4 +17,12 @@ async function main() {
   }
 }
 
-main().catch(console.error)
+main().catch(console.error);
+
+async function listDatabases(client) {
+  const dbList = await client.db().admin().listDatabases();
+
+  dbList.databases.forEach((db) => {
+    console.log(`- ${db.name}`);
+  });
+}
