@@ -5,6 +5,9 @@ const { MongoClient } = require("mongodb");
   // mongo db uri
   const uri = process.env.MONGODB_URI;
 
+  // db name
+  const dbName = "sample_airbnb";
+
   // instantiate a new client
   const client = new MongoClient(uri, { useUnifiedTopology: true });
 
@@ -12,19 +15,21 @@ const { MongoClient } = require("mongodb");
     // establish a connection to the database
     await client.connect();
 
+    const db = client.db(dbName);
+
     // get list of all databases
-    // await listDatabases(client);
+    // await listDatabases(db);
 
     // create listing
-    // await createListing(client, {
-    //   name: "Lovely Loft",
+    // await createListing(db, {
+    //   name: "Lovely Loft XXX",
     //   summary: "A charming loft in Paris",
     //   bedroom: 1,
     //   bathroom: 1,
     // });
 
     // create multiple listings
-    // await createMultipleListings(client, [
+    // await createMultipleListings(db, [
     //   {
     //     name: "Lovely Loft I",
     //     summary: "A charming loft in Paris",
@@ -40,17 +45,17 @@ const { MongoClient } = require("mongodb");
     // ]);
 
     // get listing
-    // await findOneListingByName(client, "Lovely Loft I");
+    // await findOneListingByName(db, "Lovely Loft I");
 
     // find listing by filter
-    // await findListings(client, {
+    // await findListings(db, {
     //   minBedrooms: 4,
     //   minBathrooms: 2,
     //   maxResults: 5,
     // });
 
     // update listing by name
-    await updateListingByName(client, "Lovely Loft I", {
+    await updateListingByName(db, "Lovely Loft I", {
       bedrooms: 6,
       beds: 8,
     });
@@ -65,8 +70,8 @@ const { MongoClient } = require("mongodb");
 /**
  * List Databases
  */
-async function listDatabases(client) {
-  const dbList = await client.db().admin().listDatabases();
+async function listDatabases(db) {
+  const dbList = await db.admin().listDatabases();
 
   dbList.databases.forEach((db) => {
     console.log(`- ${db.name}`);
@@ -76,9 +81,8 @@ async function listDatabases(client) {
 /**
  * Create a Listing
  */
-async function createListing(client, newListing) {
-  const result = await client
-    .db("sample_airbnb")
+async function createListing(db, newListing) {
+  const result = await db
     .collection("listingsAndReviews")
     .insertOne(newListing);
 
@@ -88,9 +92,8 @@ async function createListing(client, newListing) {
 /**
  * Create multiple listings
  */
-async function createMultipleListings(client, newListings) {
-  const result = await client
-    .db("sample_airbnb")
+async function createMultipleListings(db, newListings) {
+  const result = await db
     .collection("listingsAndReviews")
     .insertMany(newListings);
 
@@ -102,9 +105,8 @@ async function createMultipleListings(client, newListings) {
  * Retrieve a listing
  */
 
-async function findOneListingByName(client, listingName) {
-  const result = await client
-    .db("sample_airbnb")
+async function findOneListingByName(db, listingName) {
+  const result = await db
     .collection("listingsAndReviews")
     .findOne({ name: listingName });
 
@@ -119,15 +121,14 @@ async function findOneListingByName(client, listingName) {
  * Retrieve multiple listings
  */
 async function findListings(
-  client,
+  db,
   {
     minBedrooms = 0,
     minBathrooms = 0,
     maxResults = Number.MAX_SAFE_INTEGER,
   } = {}
 ) {
-  const cursor = await client
-    .db("sample_airbnb")
+  const cursor = await db
     .collection("listingsAndReviews")
     .find({
       bedrooms: { $gte: minBedrooms },
@@ -145,9 +146,8 @@ async function findListings(
   }
 }
 
-async function updateListingByName(client, listingName, updatedListing) {
-  const result = await client
-    .db("sample_airbnb")
+async function updateListingByName(db, listingName, updatedListing) {
+  const result = await db
     .collection("listingsAndReviews")
     .updateOne({ name: listingName }, { $set: updatedListing });
 
