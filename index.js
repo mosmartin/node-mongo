@@ -74,7 +74,10 @@ const { MongoClient } = require("mongodb");
     // await deleteListingByName(db, "Cozy Cottage II");
 
     // delete listings scraped before date
-    await deleteListingsScrappedBeforeDate(db, new Date("2019-02-15"));
+    // await deleteListingsScrappedBeforeDate(db, new Date("2019-02-15"));
+
+    // search listings
+    await getCheapestSuburbs(db, "Australia", "Sydney", 10);
   } catch (err) {
     console.error(err);
   } finally {
@@ -225,4 +228,48 @@ async function deleteListingsScrappedBeforeDate(db, date) {
     .deleteMany({ last_scraped: { $lt: date } });
 
   console.log(result.deletedCount);
+}
+
+/**
+ * Aggregation Pipeline
+ */
+async function getCheapestSuburbs(db, country, market, maxNumber) {
+  const pipeline = [
+    {
+      $match: {
+        bedrooms: 1,
+        "address.country": country,
+        "address.market": market,
+        "address.suburb": {
+          $exists: 1,
+          $ne: "",
+        },
+        room_type: "Entire home/apt",
+      },
+    },
+    {
+      $group: {
+        _id: "$address.suburb",
+        averagePrice: {
+          $avg: "$price",
+        },
+      },
+    },
+    {
+      $sort: {
+        averagePrice: 1,
+      },
+    },
+    {
+      $limit: maxNumber,
+    },
+  ];
+
+  const aggCursor = await db
+    .collection("listingsAndReviews")
+    .aggregate(pipeline);
+
+  await aggCursor.forEach((listing) => {
+    console.log(`${listing._id} : ${listing.averagePrice}`);
+  });
 }
