@@ -68,7 +68,10 @@ const { MongoClient } = require("mongodb");
     // });
 
     // update all listings
-    await updateAllListingsToHavePropertyType(db);
+    // await updateAllListingsToHavePropertyType(db);
+
+    // delete listing
+    await deleteListingByName(db, "Cozy Cottage II");
   } catch (err) {
     console.error(err);
   } finally {
@@ -197,4 +200,13 @@ async function updateAllListingsToHavePropertyType(db) {
 
   console.log(result.matchedCount);
   console.log(result.modifiedCount);
+}
+
+// delete a listing
+async function deleteListingByName(db, listingName) {
+  const result = await db
+    .collection("listingsAndReviews")
+    .deleteOne({ name: listingName });
+
+  console.log(result.deletedCount);
 }
