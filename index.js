@@ -42,10 +42,17 @@ const { MongoClient } = require("mongodb");
     // get listing
     // await findOneListingByName(client, "Lovely Loft I");
 
-    await findListings(client, {
-      minBedrooms: 4,
-      minBathrooms: 2,
-      maxResults: 5,
+    // find listing by filter
+    // await findListings(client, {
+    //   minBedrooms: 4,
+    //   minBathrooms: 2,
+    //   maxResults: 5,
+    // });
+
+    // update listing by name
+    await updateListingByName(client, "Lovely Loft I", {
+      bedrooms: 6,
+      beds: 8,
     });
   } catch (err) {
     console.error(err);
@@ -136,4 +143,14 @@ async function findListings(
       console.log(`${i + 1}. ${result.name}`);
     });
   }
+}
+
+async function updateListingByName(client, listingName, updatedListing) {
+  const result = await client
+    .db("sample_airbnb")
+    .collection("listingsAndReviews")
+    .updateOne({ name: listingName }, { $set: updatedListing });
+
+  console.log(result.matchedCount);
+  console.log(result.modifiedCount);
 }
