@@ -61,11 +61,14 @@ const { MongoClient } = require("mongodb");
     // });
 
     // upsert listing
-    await upsertListingByName(db, "Cozy Cottage II", {
-      name: "Cozy Cottage II",
-      bedrooms: 2,
-      bathrooms: 1,
-    });
+    // await upsertListingByName(db, "Cozy Cottage II", {
+    //   name: "Cozy Cottage II",
+    //   bedrooms: 2,
+    //   bathrooms: 1,
+    // });
+
+    // update all listings
+    await updateAllListingsToHavePropertyType(db);
   } catch (err) {
     console.error(err);
   } finally {
@@ -111,7 +114,6 @@ async function createMultipleListings(db, newListings) {
 /**
  * Retrieve a listing
  */
-
 async function findOneListingByName(db, listingName) {
   const result = await db
     .collection("listingsAndReviews")
@@ -180,4 +182,19 @@ async function upsertListingByName(db, listingName, updatedListing) {
   console.log(result.matchedCount);
   console.log(result.upsertedCount);
   console.log(result.upsertedId);
+}
+
+/**
+ * Update listings to have a property/field type
+ */
+async function updateAllListingsToHavePropertyType(db) {
+  const result = await db
+    .collection("listingsAndReviews")
+    .updateMany(
+      { propertyType: { $exists: false } },
+      { $set: { propertyType: "Unknown" } }
+    );
+
+  console.log(result.matchedCount);
+  console.log(result.modifiedCount);
 }
