@@ -71,7 +71,10 @@ const { MongoClient } = require("mongodb");
     // await updateAllListingsToHavePropertyType(db);
 
     // delete listing
-    await deleteListingByName(db, "Cozy Cottage II");
+    // await deleteListingByName(db, "Cozy Cottage II");
+
+    // delete listings scraped before date
+    await deleteListingsScrappedBeforeDate(db, new Date("2019-02-15"));
   } catch (err) {
     console.error(err);
   } finally {
@@ -202,11 +205,24 @@ async function updateAllListingsToHavePropertyType(db) {
   console.log(result.modifiedCount);
 }
 
-// delete a listing
+/**
+ * Delete a listing
+ */
 async function deleteListingByName(db, listingName) {
   const result = await db
     .collection("listingsAndReviews")
     .deleteOne({ name: listingName });
+
+  console.log(result.deletedCount);
+}
+
+/**
+ * Delete many listings
+ */
+async function deleteListingsScrappedBeforeDate(db, date) {
+  const result = await db
+    .collection("listingsAndReviews")
+    .deleteMany({ last_scraped: { $lt: date } });
 
   console.log(result.deletedCount);
 }
