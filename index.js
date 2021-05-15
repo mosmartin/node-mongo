@@ -55,9 +55,16 @@ const { MongoClient } = require("mongodb");
     // });
 
     // update listing by name
-    await updateListingByName(db, "Lovely Loft I", {
-      bedrooms: 6,
-      beds: 8,
+    // await updateListingByName(db, "Lovely Loft I", {
+    //   bedrooms: 6,
+    //   beds: 8,
+    // });
+
+    // upsert listing
+    await upsertListingByName(db, "Cozy Cottage II", {
+      name: "Cozy Cottage II",
+      bedrooms: 2,
+      bathrooms: 1,
     });
   } catch (err) {
     console.error(err);
@@ -146,6 +153,9 @@ async function findListings(
   }
 }
 
+/**
+ * Update listing
+ */
 async function updateListingByName(db, listingName, updatedListing) {
   const result = await db
     .collection("listingsAndReviews")
@@ -153,4 +163,21 @@ async function updateListingByName(db, listingName, updatedListing) {
 
   console.log(result.matchedCount);
   console.log(result.modifiedCount);
+}
+
+/**
+ * Upsert listing
+ */
+async function upsertListingByName(db, listingName, updatedListing) {
+  const result = await db
+    .collection("listingsAndReviews")
+    .updateOne(
+      { name: listingName },
+      { $set: updatedListing },
+      { upsert: true }
+    );
+
+  console.log(result.matchedCount);
+  console.log(result.upsertedCount);
+  console.log(result.upsertedId);
 }
