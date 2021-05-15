@@ -1,7 +1,7 @@
 require("dotenv").config();
 const { MongoClient } = require("mongodb");
 
-async function main() {
+(async function main() {
   // mongo db uri
   const uri = process.env.MONGODB_URI;
 
@@ -53,9 +53,7 @@ async function main() {
     // close the database connection
     await client.close();
   }
-}
-
-main().catch(console.error);
+})();
 
 /**
  * List Databases
